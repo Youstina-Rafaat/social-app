@@ -7,6 +7,7 @@ import { FaSpinner } from "react-icons/fa6";
 import Loader from "../../Loader/Loader";
 import Post from "../../Post/Post";
 import ChangePassword from "../../Components/ChangePassword/ChangePassword";
+import type { PostType } from "../../Types/Post.type";
 
 const containerClass = "mx-auto max-w-[1000px] font-['Outfit'] text-ink";
 
@@ -69,10 +70,20 @@ export default function Profile() {
   if (!user) return null;
 
   const details = [
-    { icon: <FiMail />, label: "Email", value: user.email },
-    { icon: <FiCalendar />, label: "Birthday", value: formatDate(user.dateOfBirth) },
+    { icon: <FiMail />, label: "Email", value: user.email, capitalize: false },
+    {
+      icon: <FiCalendar />,
+      label: "Birthday",
+      value: formatDate(user.dateOfBirth),
+      capitalize: false,
+    },
     { icon: <FiUser />, label: "Gender", value: user.gender, capitalize: true },
-    { icon: <FiClock />, label: "Joined", value: formatDate(user.createdAt) },
+    {
+      icon: <FiClock />,
+      label: "Joined",
+      value: formatDate(user.createdAt),
+      capitalize: false,
+    },
   ];
 
   const stats = [
@@ -139,7 +150,9 @@ export default function Profile() {
                 </span>
                 <div className="min-w-0">
                   <p className="text-[13px] text-mute">{item.label}</p>
-                  <p className={`break-words font-medium ${item.capitalize ? "capitalize" : ""}`}>
+                  <p
+                    className={`break-words font-medium ${item.capitalize ? "capitalize" : ""}`}
+                  >
                     {item.value}
                   </p>
                 </div>

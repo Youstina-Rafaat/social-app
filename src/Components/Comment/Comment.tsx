@@ -19,56 +19,64 @@ export default function Comment({
   postId: string;
   queryKey: string[];
 }) {
-  const query=useQueryClient()
-  const [isOpen, setisOpen] = useState(false)
-  const [isEditing, setisEditing] = useState(false)
-  const [newContent, setnewContent] = useState(comment.content)
-  const [newImage, setnewImage] = useState<File | null>(null)
-  const{userId:loginUserId}=useContext(AuthContext)
-const formData = new FormData()
-  function handleCommentDelete(){
-      return axios.delete(`https://route-posts.routemisr.com/posts/${postId}/comments/${comment._id}`,{
-        headers:{
-        Authorization:`Bearer ${localStorage.getItem("userToken")}`
-      }
-      })
-    }
+  const query = useQueryClient();
+  const [isOpen, setisOpen] = useState(false);
+  const [isEditing, setisEditing] = useState(false);
+  const [newContent, setnewContent] = useState(comment.content);
+  const [newImage, setnewImage] = useState<File | null>(null);
+  const { userId: loginUserId } = useContext(AuthContext);
 
-  function handleCommentUpdate(){
-      formData.append("content", newContent)
-      if (newImage) {
-        formData.append("image", newImage)
-      }
-      return axios.put(`https://route-posts.routemisr.com/posts/${postId}/comments/${comment._id}`, formData, {
-        headers:{
-        Authorization:`Bearer ${localStorage.getItem("userToken")}`
-      }
-      })
-    }
-
-  const {isPending,mutate}=useMutation({
-      mutationFn:handleCommentDelete,
-      onSuccess:(res)=>{
-        toast.success(res.data.message)
-        query.invalidateQueries({queryKey})
+  function handleCommentDelete() {
+    return axios.delete(
+      `https://route-posts.routemisr.com/posts/${postId}/comments/${comment._id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
       },
-      onError:(err)=>{
-        toast.error(err.message)
-      }
-    })
+    );
+  }
 
-  const {isPending:isUpdating,mutate:updateMutate}=useMutation({
-      mutationFn:handleCommentUpdate,
-      onSuccess:(res)=>{
-        toast.success(res.data.message)
-        query.invalidateQueries({queryKey})
-        setisEditing(false)
-        setnewImage(null)
+  function handleCommentUpdate() {
+    const formData = new FormData();
+    formData.append("content", newContent);
+    if (newImage) {
+      formData.append("image", newImage);
+    }
+    return axios.put(
+      `https://route-posts.routemisr.com/posts/${postId}/comments/${comment._id}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
       },
-      onError:(err)=>{
-        toast.error(err.message)
-      }
-    })
+    );
+  }
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: handleCommentDelete,
+    onSuccess: (res) => {
+      toast.success(res.data.message);
+      query.invalidateQueries({ queryKey });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const { isPending: isUpdating, mutate: updateMutate } = useMutation({
+    mutationFn: handleCommentUpdate,
+    onSuccess: (res) => {
+      toast.success(res.data.message);
+      query.invalidateQueries({ queryKey });
+      setisEditing(false);
+      setnewImage(null);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   return (
     <>
@@ -85,7 +93,7 @@ const formData = new FormData()
               <input
                 type="text"
                 value={newContent}
-                onChange={(e)=>setnewContent(e.target.value)}
+                onChange={(e) => setnewContent(e.target.value)}
                 className="w-full rounded-[14px] border-[1.5px] border-acc bg-card px-3.5 py-2.5 text-ink ring-[3px] ring-soft focus:outline-none"
               />
 
@@ -102,7 +110,7 @@ const formData = new FormData()
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e)=>setnewImage(e.target.files?.[0] || null)}
+                  onChange={(e) => setnewImage(e.target.files?.[0] || null)}
                   className="hidden"
                 />
               </label>
@@ -110,17 +118,21 @@ const formData = new FormData()
               <div className="flex items-center justify-end gap-2">
                 <small className="me-auto text-mute">Editing comment</small>
                 <button
-                  onClick={()=>{setisEditing(false);setnewContent(comment.content);setnewImage(null)}}
+                  onClick={() => {
+                    setisEditing(false);
+                    setnewContent(comment.content);
+                    setnewImage(null);
+                  }}
                   className="cursor-pointer rounded-[10px] bg-soft px-4 py-1.5 text-sm font-semibold text-acc hover:brightness-95"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={()=>updateMutate()}
-                  disabled={isUpdating || newContent.trim()===""}
+                  onClick={() => updateMutate()}
+                  disabled={isUpdating || newContent.trim() === ""}
                   className="flex cursor-pointer items-center justify-center rounded-[10px] bg-acc px-4 py-1.5 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isUpdating?<FaSpinner className="animate-spin"/>:"Update"}
+                  {isUpdating ? <FaSpinner className="animate-spin" /> : "Update"}
                 </button>
               </div>
             </div>
@@ -144,7 +156,7 @@ const formData = new FormData()
                     <button
                       type="button"
                       aria-label="Comment options"
-                      onClick={()=>setisOpen(!isOpen)}
+                      onClick={() => setisOpen(!isOpen)}
                       className="cursor-pointer rounded-lg p-1.5 text-mute hover:bg-soft hover:text-acc"
                     >
                       <HiDotsVertical className="text-lg" />
@@ -152,17 +164,29 @@ const formData = new FormData()
                     {isOpen && (
                       <div className="absolute start-0 top-full z-20 mt-1.5 min-w-[170px] rounded-[14px] border border-line bg-card p-1.5 shadow-[0_12px_32px_rgba(20,25,60,.18)]">
                         <button
-                          onClick={()=>{setisEditing(true);setisOpen(false)}}
+                          onClick={() => {
+                            setisEditing(true);
+                            setisOpen(false);
+                          }}
                           className={menuItemClass}
                         >
                           Edit <FaPen />
                         </button>
                         <button
-                          onClick={()=>{mutate();setisOpen(false)}}
+                          onClick={() => {
+                            mutate();
+                            setisOpen(false);
+                          }}
                           disabled={isPending}
                           className={`${menuItemClass} !text-err hover:!bg-err/10`}
                         >
-                          {isPending?<FaSpinner className="animate-spin" />:<>Delete <FaTrashAlt /></>}
+                          {isPending ? (
+                            <FaSpinner className="animate-spin" />
+                          ) : (
+                            <>
+                              Delete <FaTrashAlt />
+                            </>
+                          )}
                         </button>
                       </div>
                     )}
@@ -170,12 +194,15 @@ const formData = new FormData()
                 )}
               </div>
               <p className="ms-1 mt-1 text-[13px] text-mute">
-                {new Date(comment.createdAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
+                {new Date(comment.createdAt).toLocaleString("en-GB", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
               </p>
             </>
           )}
         </div>
       </div>
     </>
-  )
+  );
 }

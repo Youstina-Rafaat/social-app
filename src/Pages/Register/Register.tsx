@@ -1,6 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { registerSchema ,type registerSchemaType} from "../../schemas/auth.schema";
+import {
+  registerSchema,
+  type registerSchemaType,
+} from "../../schemas/auth.schema";
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -15,10 +18,10 @@ const radioLabelClass =
   "flex flex-1 cursor-pointer select-none items-center gap-2 rounded-xl border-[1.5px] border-line px-3.5 py-3 text-sm font-medium text-ink has-[:checked]:border-acc has-[:checked]:bg-soft";
 
 export default function Register() {
-  const {userLogin,setUserLogin}=useContext(AuthContext)
-  const navigate=useNavigate()
-  const [apiError, setApiError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const { setUserLogin } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<registerSchemaType>({
     defaultValues: {
       name: "",
@@ -31,26 +34,26 @@ export default function Register() {
     mode: "onChange",
     resolver: zodResolver(registerSchema),
   });
-  const { register, handleSubmit, formState, getValues, watch, setError } =
-    form;
+  const { register, handleSubmit, formState } = form;
+
   function handleRegister(values: registerSchemaType) {
-    console.log(values);
-    setIsLoading(true)
-    axios.post(`https://route-posts.routemisr.com/users/signup`,values)
-    .then((res)=>{
-      if(res.data.success){
-        toast.success("Account Created! You Can log in Now.")
-        localStorage.setItem("userToken",res.data.data.token)
-        setUserLogin(res.data.data.token)
-        navigate("/login")
-      }
-    })
-    .catch((err)=>{
-      setApiError(err.response.data.message)
-    })
-    .finally(()=>{
-      setIsLoading(false)
-    })
+    setIsLoading(true);
+    axios
+      .post(`https://route-posts.routemisr.com/users/signup`, values)
+      .then((res) => {
+        if (res.data.success) {
+          toast.success("Account Created! You Can log in Now.");
+          localStorage.setItem("userToken", res.data.data.token);
+          setUserLogin(res.data.data.token);
+          navigate("/login");
+        }
+      })
+      .catch((err) => {
+        setApiError(err.response.data.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   return (
@@ -215,7 +218,7 @@ export default function Register() {
           </button>
 
           <p className="mt-5 text-center text-mute">
-            Already have an account? 
+            Already have an account?
             <Link to="/login" className="font-semibold text-acc">
               <span> Log in</span>
             </Link>
