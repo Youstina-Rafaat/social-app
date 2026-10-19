@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { loginSchema ,type loginSchemaType} from "../../schemas/auth.schema";
+import { loginSchema, type loginSchemaType } from "../../schemas/auth.schema";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -12,9 +12,9 @@ const inputClass =
 const errorClass = "mt-1 text-[13px] font-bold text-err";
 
 export default function Login() {
-  const navigate=useNavigate()
-  const [apiError, setApiError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate();
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<loginSchemaType>({
     defaultValues: {
       email: "",
@@ -23,24 +23,24 @@ export default function Login() {
     mode: "onChange",
     resolver: zodResolver(loginSchema),
   });
-  const { register, handleSubmit, formState, getValues, watch, setError } =
-    form;
+  const { register, handleSubmit, formState } = form;
+
   function handleLogin(values: loginSchemaType) {
-    console.log(values);
-    setIsLoading(true)
-    axios.post(`https://route-posts.routemisr.com/users/signin`,values)
-    .then((res)=>{
-      if(res.data.success){
-        toast.success("Logged in successfully")
-        navigate("/home")
-      }
-    })
-    .catch((err)=>{
-      setApiError(err.response.data.message)
-    })
-    .finally(()=>{
-      setIsLoading(false)
-    })
+    setIsLoading(true);
+    axios
+      .post(`https://route-posts.routemisr.com/users/signin`, values)
+      .then((res) => {
+        if (res.data.success) {
+          toast.success("Logged in successfully");
+          navigate("/home");
+        }
+      })
+      .catch((err) => {
+        setApiError(err.response.data.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   return (
@@ -117,7 +117,7 @@ export default function Login() {
           </button>
 
           <p className="mt-5 text-center text-mute">
-            New here? 
+            New here?
             <Link to="/register" className="font-semibold text-acc">
               <span> Create an account</span>
             </Link>
@@ -127,5 +127,3 @@ export default function Login() {
     </div>
   );
 }
-
-
