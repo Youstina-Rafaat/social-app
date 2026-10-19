@@ -10,22 +10,23 @@ import PostDetails from "./Pages/PostDetails/PostDetails"
 import { Toaster } from 'react-hot-toast';
 import Offline from "./Components/Offline/Offline"
 import {useNetworkState} from 'react-use';
+import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute"
 function App() {
   const {online} =useNetworkState()
  const query=new QueryClient()
 const routers=createBrowserRouter([{
   path:"",element:<Layout/>,
   children:[{
-    path:"home",element:<Home/>
+    path:"home",element:<ProtectedRoute><Home/></ProtectedRoute>
   },
   {
-    index:true,element:<Home/>
+    index:true,element:<ProtectedRoute><Home/></ProtectedRoute>
   },
     {
-    path:"profile",element:<Profile/>
+    path:"profile",element:<ProtectedRoute><Profile/></ProtectedRoute>
   },
     {
-    path:"postdetails/:id",element:<PostDetails/>
+    path:"postdetails/:id",element:<ProtectedRoute><PostDetails/></ProtectedRoute>
   },
 ]
 },{path:"login",element:<Login/>},

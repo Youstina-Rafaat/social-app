@@ -4,10 +4,9 @@ import {
   registerSchema,
   type registerSchemaType,
 } from "../../schemas/auth.schema";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { AuthContext } from "../../Context/AuthContext";
 import toast from "react-hot-toast";
 
 const labelClass = "mb-1.5 block text-sm font-semibold text-ink";
@@ -18,7 +17,7 @@ const radioLabelClass =
   "flex flex-1 cursor-pointer select-none items-center gap-2 rounded-xl border-[1.5px] border-line px-3.5 py-3 text-sm font-medium text-ink has-[:checked]:border-acc has-[:checked]:bg-soft";
 
 export default function Register() {
-  const { setUserLogin } = useContext(AuthContext);
+  
   const navigate = useNavigate();
   const [apiError, setApiError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,8 +42,6 @@ export default function Register() {
       .then((res) => {
         if (res.data.success) {
           toast.success("Account Created! You Can log in Now.");
-          localStorage.setItem("userToken", res.data.data.token);
-          setUserLogin(res.data.data.token);
           navigate("/login");
         }
       })

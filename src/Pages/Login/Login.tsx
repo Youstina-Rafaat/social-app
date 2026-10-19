@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { loginSchema, type loginSchemaType } from "../../schemas/auth.schema";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { AuthContext } from "../../Context/AuthContext";
 
 const labelClass = "mb-1.5 block text-sm font-semibold text-ink";
 const inputClass =
@@ -12,6 +13,7 @@ const inputClass =
 const errorClass = "mt-1 text-[13px] font-bold text-err";
 
 export default function Login() {
+  const { setUserLogin } = useContext(AuthContext);
   const navigate = useNavigate();
   const [apiError, setApiError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +34,9 @@ export default function Login() {
       .then((res) => {
         if (res.data.success) {
           toast.success("Logged in successfully");
-          navigate("/home");
+          localStorage.setItem("userToken", res.data.data.token);
+          setUserLogin(res.data.data.token);
+          navigate("/");
         }
       })
       .catch((err) => {
