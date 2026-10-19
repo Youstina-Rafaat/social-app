@@ -14,6 +14,7 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../Context/AuthContext";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa6";
+import type { PostType, TopComment } from "../Types/Post.type";
 
 const menuItemClass =
   "flex w-full cursor-pointer items-center justify-between gap-3 rounded-[10px] px-3.5 py-2.5 font-medium text-ink transition-colors hover:bg-soft hover:text-acc disabled:cursor-not-allowed disabled:opacity-60";
@@ -31,7 +32,16 @@ export default function Post({
   post: PostType;
   isPostDetails: boolean;
 }) {
-  const { user, createdAt, body, image, topComment, _id,commentsCount,likesCount} = post;
+  const {
+    user,
+    createdAt,
+    body,
+    image,
+    topComment,
+    _id,
+    commentsCount,
+    likesCount,
+  } = post;
   const { photo, name, _id: userId } = user;
   const query = useQueryClient();
   const navigate = useNavigate();
@@ -53,7 +63,7 @@ export default function Post({
     );
   }
 
-  const { data, isLoading, isError, error, isFetching } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["getAllComment"],
     queryFn: getAllComment,
     enabled: isPostDetails,
@@ -67,23 +77,18 @@ export default function Post({
     });
   }
 
-  const {
-    data: dataPostDelete,
-    isPending,
-    mutate,
-  } = useMutation({
+  const { isPending, mutate } = useMutation({
     mutationFn: handlePostDelete,
     onSuccess: (res) => {
       toast.success(res.data.message);
       query.invalidateQueries({ queryKey: ["getAllPosts"] });
-      if(isPostDetails){
-      navigate("/");
+      if (isPostDetails) {
+        navigate("/");
       }
     },
     onError: (err) => {
       toast.error(err.message);
     },
-    onSettled: () => {},
   });
 
   function handlePostUpdate() {
@@ -137,7 +142,10 @@ export default function Post({
             <div>
               <p className="font-bold leading-tight">{name}</p>
               <p className="text-sm text-mute">
-                {new Date(createdAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
+                {new Date(createdAt).toLocaleString("en-GB", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
               </p>
             </div>
           </div>
@@ -193,8 +201,12 @@ export default function Post({
           )}
         </div>
         <div className="pt-2 pb-4 flex justify-between">
-          <div><span>{likesCount}</span> likes</div>
-          <div><span>{commentsCount}</span> comments</div>
+          <div>
+            <span>{likesCount}</span> likes
+          </div>
+          <div>
+            <span>{commentsCount}</span> comments
+          </div>
         </div>
 
         <div className="flex gap-1 border-t border-line pt-1.5">
@@ -224,7 +236,7 @@ export default function Post({
 
         {isPostDetails &&
           data?.data.data.comments &&
-          data?.data.data.comments.map((comment) => (
+          data?.data.data.comments.map((comment: TopComment) => (
             <Comment
               postId={_id}
               comment={comment}
@@ -285,7 +297,7 @@ export default function Post({
               </button>
               <button
                 onClick={() => updateMutate()}
-                disabled={isUpdating || newContent=== ""}
+                disabled={isUpdating || newContent === ""}
                 className={primaryBtnClass}
               >
                 {isUpdating ? <FaSpinner className="animate-spin" /> : "Update"}
