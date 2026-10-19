@@ -26,6 +26,7 @@ export interface User {
 export interface TopComment {
   _id: string
   content: string
+  image?: string
   commentCreator: CommentCreator
   post: string
   parentComment: any
