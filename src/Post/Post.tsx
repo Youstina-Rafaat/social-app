@@ -14,7 +14,8 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../Context/AuthContext";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa6";
-import type { PostType, TopComment } from "../Types/Post.type";
+import type { PostType } from "../Types/Post.type";
+import type { CommentType } from "../Types/Comment.type";
 
 const menuItemClass =
   "flex w-full cursor-pointer items-center justify-between gap-3 rounded-[10px] px-3.5 py-2.5 font-medium text-ink transition-colors hover:bg-soft hover:text-acc disabled:cursor-not-allowed disabled:opacity-60";
@@ -236,7 +237,7 @@ export default function Post({
 
         {isPostDetails &&
           data?.data.data.comments &&
-          data?.data.data.comments.map((comment: TopComment) => (
+          data?.data.data.comments.map((comment: CommentType) => (
             <Comment
               postId={_id}
               comment={comment}

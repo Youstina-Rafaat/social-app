@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import type { TopComment } from "../../Types/Post.type";
+import type { CommentType } from "../../Types/Comment.type";
 import { AuthContext } from "../../Context/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -15,7 +15,7 @@ export default function Comment({
   postId,
   queryKey,
 }: {
-  comment: TopComment;
+  comment: CommentType;
   postId: string;
   queryKey: string[];
 }) {
@@ -205,4 +205,8 @@ export default function Comment({
       </div>
     </>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> f7354201667d48a122dcbd0bdaebddde28c4ab37

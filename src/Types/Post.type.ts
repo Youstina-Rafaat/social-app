@@ -1,3 +1,4 @@
+import type { CommentType } from "./Comment.type";
 export interface PostType {
   _id: string
   body: string
@@ -8,7 +9,7 @@ export interface PostType {
   likes: any[]
   createdAt: string
   commentsCount: number
-  topComment: TopComment
+  topComment: CommentType
   sharesCount: number
   likesCount: number
   isShare: boolean
@@ -23,20 +24,4 @@ export interface User {
   photo: string
 }
 
-export interface TopComment {
-  _id: string
-  content: string
-  image?: string
-  commentCreator: CommentCreator
-  post: string
-  parentComment: any
-  likes: any[]
-  createdAt: string
-}
 
-export interface CommentCreator {
-  _id: string
-  name: string
-  username: string
-  photo: string
-}
