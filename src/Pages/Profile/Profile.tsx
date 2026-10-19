@@ -1,7 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { Helmet } from "react-helmet";
 import { FiCalendar, FiClock, FiLock, FiMail, FiUser } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa6";
 import Loader from "../../Loader/Loader";
@@ -95,10 +94,6 @@ export default function Profile() {
 
   return (
     <>
-      <Helmet>
-        <title>Profile</title>
-      </Helmet>
-
       <div className={`${containerClass} my-6`}>
         {user.cover ? (
           <img
