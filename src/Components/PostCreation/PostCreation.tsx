@@ -1,61 +1,67 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { FiImage, FiSend } from "react-icons/fi";
 import { IoIosCloseCircle } from "react-icons/io";
 import { FaSpinner } from "react-icons/fa6";
 import toast from "react-hot-toast";
+
 export default function PostCreation() {
-  const [isUploaded, setisUploaded] = useState("")
+  const [isUploaded, setisUploaded] = useState("");
 
-  const textInput=useRef(null)
-  const imageInput=useRef(null)
+  const textInput = useRef<HTMLTextAreaElement>(null);
+  const imageInput = useRef<HTMLInputElement>(null);
 
-  const formData=new FormData()
+  const query = useQueryClient();
 
-  const query=useQueryClient()
-
-  function handlePreviweImage(e){
-    const path=URL.createObjectURL(e.target.files[0])
-    setisUploaded(path)
-  }
-  function createPost(){
-    return axios.post(`https://route-posts.routemisr.com/posts`,formData,{
-      headers:{
-        Authorization:`Bearer ${localStorage.getItem("userToken")}`
-      }
-    })
+  function handlePreviweImage(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setisUploaded(URL.createObjectURL(file));
+    }
   }
 
-
-  function clearForm(){
-    setisUploaded("")
-    textInput.current.value=""
-    imageInput.current.value=""
+  function createPost(formData: FormData) {
+    return axios.post(`https://route-posts.routemisr.com/posts`, formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+      },
+    });
   }
 
-  const {data,isPending,mutate}=useMutation({
-    mutationFn:createPost,
-    onSuccess:(res)=>{
-      clearForm()
-      query.invalidateQueries({queryKey:["getAllPosts"]})
-      toast.success(res.data.message)
+  function clearForm() {
+    setisUploaded("");
+    if (textInput.current) textInput.current.value = "";
+    if (imageInput.current) imageInput.current.value = "";
+  }
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: createPost,
+    onSuccess: (res) => {
+      clearForm();
+      query.invalidateQueries({ queryKey: ["getAllPosts"] });
+      toast.success(res.data.message);
     },
-    onError:(err)=>{toast.error(err.message)},
-    onSettled:()=>{}
-  })
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
-  function handleCreatePost(){
-    if(textInput.current.value===""&& imageInput.current.value==="")return
-    if(textInput.current.value){
-      formData.append("body",textInput.current.value)
-    }
-    if(imageInput.current.value){
-      formData.append("image",imageInput.current.files[0])
-    }
+  function handleCreatePost() {
+    const text = textInput.current?.value ?? "";
+    const file = imageInput.current?.files?.[0];
+    if (!text && !file) return;
 
-    mutate()
+    const formData = new FormData();
+    if (text) {
+      formData.append("body", text);
+    }
+    if (file) {
+      formData.append("image", file);
+    }
+    mutate(formData);
   }
+
   return (
     <div className="mx-auto w-[1000px] rounded-2xl border border-line bg-card p-4 font-['Outfit'] text-ink shadow-sm">
       <textarea
@@ -74,7 +80,10 @@ export default function PostCreation() {
             className="max-h-[320px] w-full rounded-xl object-cover"
           />
           <IoIosCloseCircle
-            onClick={()=>{setisUploaded("");imageInput.current.value=""}}
+            onClick={() => {
+              setisUploaded("");
+              if (imageInput.current) imageInput.current.value = "";
+            }}
             className="absolute end-2 top-2 size-8 cursor-pointer text-white drop-shadow"
           />
         </div>
@@ -84,23 +93,29 @@ export default function PostCreation() {
         <label className="flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-mute transition hover:bg-soft hover:text-acc">
           <FiImage size={18} />
           Add image
-          <input ref={imageInput} type="file" accept="image/*" className="hidden" onChange={handlePreviweImage}/>
+          <input
+            ref={imageInput}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handlePreviweImage}
+          />
         </label>
 
         <button
           type="submit"
           disabled={isPending}
-          onClick={()=>handleCreatePost()}
+          onClick={() => handleCreatePost()}
           className="flex cursor-pointer items-center gap-2 rounded-xl bg-acc px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPending?<>
-          <FaSpinner className="animate-spin"/>
-          </>
-          :<>
-          <FiSend size={16} />
-          Create Post
-          </>
-        }
+          {isPending ? (
+            <FaSpinner className="animate-spin" />
+          ) : (
+            <>
+              <FiSend size={16} />
+              Create Post
+            </>
+          )}
         </button>
       </div>
     </div>
