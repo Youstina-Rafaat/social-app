@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { HiDotsVertical } from "react-icons/hi";
 import { FaPen, FaSpinner, FaTrashAlt } from "react-icons/fa";
+import { IoIosCloseCircle } from "react-icons/io";
 
 const menuItemClass =
   "flex w-full cursor-pointer items-center justify-between gap-3 rounded-[10px] px-3.5 py-2.5 font-medium text-ink transition-colors hover:bg-soft hover:text-acc disabled:cursor-not-allowed disabled:opacity-60";
@@ -98,11 +99,23 @@ export default function Comment({
               />
 
               {(newImage || comment.image) && (
+              <div className="max-w-70 relative mt-3 overflow-hidden rounded-xl">
                 <img
                   src={newImage ? URL.createObjectURL(newImage) : comment.image}
                   alt=""
-                  className="max-h-60 rounded-xl object-cover"
+                  className="max-w-70 max-h-70 rounded-xl object-cover"
                 />
+                {newImage && (
+                  <div className="mt-3">
+                            <IoIosCloseCircle
+                              onClick={() => 
+                                setnewImage(null)
+                              }
+                              className="absolute end-2 top-2 size-8 cursor-pointer text-white drop-shadow"
+                            />
+                          </div>
+                 )}  
+                 </div>
               )}
 
               <label className="inline-block w-fit cursor-pointer rounded-full bg-soft px-3.5 py-1.5 text-sm font-semibold text-acc hover:brightness-95">
@@ -205,5 +218,4 @@ export default function Comment({
       </div>
     </>
   );
-
 }

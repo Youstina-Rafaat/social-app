@@ -63,7 +63,7 @@ export default function PostCreation() {
   }
 
   return (
-    <div className="mx-auto w-[1000px] rounded-2xl border border-line bg-card p-4 font-['Outfit'] text-ink shadow-sm">
+    <div className="mx-auto max-w-[1000px] rounded-2xl border border-line bg-card p-4 font-['Outfit'] text-ink shadow-sm">
       <textarea
         ref={textInput}
         rows={3}

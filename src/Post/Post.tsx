@@ -10,7 +10,7 @@ import CommentCreation from "../Components/CommentCreation/CommentCreation";
 import { HiDotsVertical } from "react-icons/hi";
 import { FaPen } from "react-icons/fa";
 import { FaTrashAlt } from "react-icons/fa";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "../Context/AuthContext";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa6";
@@ -52,6 +52,28 @@ export default function Post({
   const [isEditing, setisEditing] = useState(false);
   const [newContent, setnewContent] = useState(body);
   const [newImage, setnewImage] = useState<File | null>(null);
+  const [removeImage, setRemoveImage] = useState(false);
+
+  const objectUrl = useMemo(
+    () => (newImage ? URL.createObjectURL(newImage) : null),
+    [newImage],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [objectUrl]);
+
+  const previewSrc = objectUrl ?? (image && !removeImage ? image : null);
+
+  function handleRemoveImage() {
+    if (newImage) {
+      setnewImage(null);
+    } else {
+      setRemoveImage(true);
+    }
+  }
 
   function getAllComment() {
     return axios.get(
@@ -97,6 +119,8 @@ export default function Post({
     formData.append("body", newContent);
     if (newImage) {
       formData.append("image", newImage);
+    } else if (removeImage) {
+      formData.append("removeImage", "true");
     }
     return axios.put(
       `https://route-posts.routemisr.com/posts/${_id}`,
@@ -117,6 +141,7 @@ export default function Post({
       query.invalidateQueries({ queryKey: ["getSinglePost"] });
       setisEditing(false);
       setnewImage(null);
+      setRemoveImage(false);
     },
     onError: (err) => {
       toast.error(err.message);
@@ -256,32 +281,34 @@ export default function Post({
               value={newContent}
               onChange={(e) => setnewContent(e.target.value)}
             />
-            {(newImage || image) && (
+            {previewSrc && (
               <div className="relative mt-3 overflow-hidden rounded-xl">
                 <img
-                  src={newImage ? URL.createObjectURL(newImage) : image}
+                  src={previewSrc}
                   alt=""
                   className="h-80 w-full object-cover "
                 />
-                {newImage && (
-                  <button
-                    type="button"
-                    aria-label="Remove new image"
-                    onClick={() => setnewImage(null)}
-                    className="absolute right-2 top-2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-black/60 text-lg leading-none text-white hover:bg-black/80"
-                  >
-                    &times;
-                  </button>
-                )}
+                <button
+                  type="button"
+                  aria-label="Remove image"
+                  onClick={handleRemoveImage}
+                  className="absolute right-2 top-2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-black/60 text-lg leading-none text-white hover:bg-black/80"
+                >
+                  &times;
+                </button>
               </div>
             )}
             <label className="mt-3 inline-block cursor-pointer rounded-full bg-soft px-4 py-2 text-sm font-semibold text-acc hover:brightness-95">
-              Change image
+              {previewSrc ? "Change image" : "Add image"}
               <input
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => setnewImage(e.target.files?.[0] || null)}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setnewImage(file);
+                  if (file) setRemoveImage(false);
+                }}
               />
             </label>
             <div className="mt-5 flex justify-end gap-3">
@@ -291,6 +318,7 @@ export default function Post({
                   setisEditing(false);
                   setnewContent(body);
                   setnewImage(null);
+                  setRemoveImage(false);
                 }}
                 className={ghostBtnClass}
               >
